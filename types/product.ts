@@ -19,4 +19,5 @@ export type Product = {
   inStock: boolean;
   colors: string[]; // hex
   sizes: string[];
+  images: string[]; // روابط كاملة، الأولى هي الرئيسية
 };

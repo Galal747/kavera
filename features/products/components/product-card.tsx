@@ -1,18 +1,45 @@
+import Image from "next/image";
 import Link from "next/link";
 import { formatPrice } from "@/lib/format";
 import type { Product } from "@/types/product";
 
+const CARD_SIZES = "(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw";
+
 export function ProductCard({ product }: { product: Product }) {
+  const [mainImage, hoverImage] = product.images;
+
   return (
     <Link
       href={`/product/${product.slug}`}
       className="group block focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-neutral-950"
     >
-      {/* مكان الصورة: placeholder لحد ما نرفع صور حقيقية */}
-      <div className="relative aspect-3/4 overflow-hidden bg-neutral-200">
-        <div className="absolute inset-0 flex items-center justify-center text-sm uppercase tracking-widest text-neutral-400 transition-transform duration-500 group-hover:scale-105">
-          Image
-        </div>
+      <div className="relative aspect-[3/4] overflow-hidden bg-neutral-200">
+        {mainImage ? (
+          <>
+            <Image
+              src={mainImage}
+              alt={product.name}
+              fill
+              sizes={CARD_SIZES}
+              className="object-cover"
+            />
+            {/* الصورة التانية بتظهر عند الـ hover (لو موجودة) */}
+            {hoverImage && (
+              <Image
+                src={hoverImage}
+                alt=""
+                aria-hidden="true"
+                fill
+                sizes={CARD_SIZES}
+                className="object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+              />
+            )}
+          </>
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center text-sm uppercase tracking-widest text-neutral-400">
+            No image
+          </div>
+        )}
 
         {product.isNew && (
           <span className="absolute left-3 top-3 bg-neutral-950 px-2 py-1 text-xs uppercase tracking-wider text-white">

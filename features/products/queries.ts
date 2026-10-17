@@ -2,6 +2,7 @@ import type { QueryData, SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/database";
 import type { Product, ProductCategory } from "@/types/product";
+import { getProductImageUrl } from "@/lib/storage";
 
 // ---------- شكل الـ query ----------
 // بنجيب المنتج + تصنيفه + الـ variants (بمقاساتها وألوانها) في طلب واحد.
@@ -13,7 +14,8 @@ const PRODUCT_SELECT = `
     stock_quantity,
     sizes ( name, sort_order ),
     colors ( hex )
-  )
+  ),
+  product_images ( storage_path, position )
 `;
 
 function baseQuery(supabase: SupabaseClient<Database>) {
@@ -38,7 +40,7 @@ function toProduct(row: ProductRow): Product {
 
   const colors = [...new Set(variants.map((v) => v.colors.hex))];
 
-  return {
+    return {
     id: row.id,
     slug: row.slug,
     name: row.name,
@@ -49,6 +51,9 @@ function toProduct(row: ProductRow): Product {
     inStock: variants.some((v) => v.stock_quantity > 0),
     colors,
     sizes,
+    images: [...row.product_images]
+      .sort((a, b) => a.position - b.position)
+      .map((img) => getProductImageUrl(img.storage_path)),
   };
 }
 
