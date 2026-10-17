@@ -39,6 +39,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      addresses: {
+        Row: {
+          city: string
+          created_at: string
+          full_name: string
+          governorate: string
+          id: string
+          is_default: boolean
+          notes: string | null
+          phone: string
+          street: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          city: string
+          created_at?: string
+          full_name: string
+          governorate: string
+          id?: string
+          is_default?: boolean
+          notes?: string | null
+          phone: string
+          street: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          city?: string
+          created_at?: string
+          full_name?: string
+          governorate?: string
+          id?: string
+          is_default?: boolean
+          notes?: string | null
+          phone?: string
+          street?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       cart_items: {
         Row: {
           created_at: string
@@ -331,6 +373,10 @@ export type Database = {
     }
     Functions: {
       is_admin: { Args: never; Returns: boolean }
+      set_default_address: {
+        Args: { p_address_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
