@@ -5,7 +5,8 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { productSchema, variantSchema, variantUpdateSchema } from "./schemas";
+import { productSchema, variantSchema, variantUpdateSchema } from "@/features/admin/products/schemas";
+import { PRODUCT_IMAGES_BUCKET } from "@/lib/storage";
 
 export type ActionResult = { error?: string; ok?: boolean } | undefined;
 
@@ -100,6 +101,13 @@ export async function deleteProductAction(id: unknown): Promise<ActionResult> {
   if (!idParsed.success) return { error: GENERIC_ERROR };
 
   const supabase = await createClient();
+
+  // نجيب مسارات الصور قبل ما الصفوف تتمسح
+  const { data: images } = await supabase
+    .from("product_images")
+    .select("storage_path")
+    .eq("product_id", idParsed.data);
+
   const { data, error } = await supabase
     .from("products")
     .delete()
@@ -117,6 +125,15 @@ export async function deleteProductAction(id: unknown): Promise<ActionResult> {
     return { error: GENERIC_ERROR };
   }
   if (!data || data.length === 0) return { error: "Product not found." };
+
+  if (images && images.length > 0) {
+    const { error: storageError } = await supabase.storage
+      .from(PRODUCT_IMAGES_BUCKET)
+      .remove(images.map((i) => i.storage_path));
+    if (storageError) {
+      console.error("Could not remove product files:", storageError.message);
+    }
+  }
 
   refreshEverything();
   redirect("/admin/products");

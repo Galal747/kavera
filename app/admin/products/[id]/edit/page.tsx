@@ -2,12 +2,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { z } from "zod";
 import { DeleteProductButton } from "@/features/admin/products/components/delete-product-button";
+import { ImagesManager } from "@/features/admin/products/components/images-manager";
 import { ProductForm } from "@/features/admin/products/components/product-form";
 import {
   VariantsManager,
   type VariantRowData,
 } from "@/features/admin/products/components/variants-manager";
 import { requireAdmin } from "@/lib/auth";
+import { getProductImageUrl } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/server";
 
 type Props = {
@@ -31,7 +33,8 @@ export default async function EditProductPage({ params }: Props) {
            id, sku, stock_quantity, price_override,
            sizes ( name, sort_order ),
            colors ( name, hex )
-         )`,
+         ),
+         product_images ( id, storage_path, position )`,
       )
       .eq("id", id)
       .maybeSingle(),
@@ -57,6 +60,13 @@ export default async function EditProductPage({ params }: Props) {
       colorHex: v.colors.hex,
       stock: v.stock_quantity,
       priceOverride: v.price_override === null ? null : Number(v.price_override),
+    }));
+
+  const images = [...product.product_images]
+    .sort((a, b) => a.position - b.position)
+    .map((img) => ({
+      id: img.id,
+      url: getProductImageUrl(img.storage_path),
     }));
 
   return (
@@ -89,6 +99,8 @@ export default async function EditProductPage({ params }: Props) {
           }}
         />
       </div>
+
+      <ImagesManager productId={product.id} images={images} />
 
       <VariantsManager
         productId={product.id}
