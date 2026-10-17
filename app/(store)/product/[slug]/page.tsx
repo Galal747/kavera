@@ -8,6 +8,8 @@ import {
   getRelatedProducts,
 } from "@/features/products/queries";
 import { formatPrice } from "@/lib/format";
+import { WishlistButton } from "@/features/wishlist/components/wishlist-button";
+import { getWishlistProductIds } from "@/features/wishlist/queries";
 
 type ProductPageProps = {
   params: Promise<{ slug: string }>;
@@ -33,7 +35,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   if (!product) notFound();
 
-  const related = await getRelatedProducts(product);
+  const [related, wishlistIds] = await Promise.all([
+    getRelatedProducts(product),
+    getWishlistProductIds(),
+  ]);
   const [mainImage, ...otherImages] = product.images;
 
   return (
@@ -56,7 +61,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
               <div key={src} className="relative aspect-[3/4] bg-neutral-200">
                 <Image
                   src={src}
-                  alt={`${product.name} - view ${i + 2}`}
+                  alt={`${product.name} view ${i + 2}`}
                   fill
                   sizes="(min-width: 768px) 25vw, 50vw"
                   className="object-cover"
@@ -85,8 +90,14 @@ export default async function ProductPage({ params }: ProductPageProps) {
             </p>
           )}
 
-          <div className="mt-8">
+          <div className="mt-8 space-y-4">
             <VariantSelector product={product} />
+            <WishlistButton
+              variant="inline"
+              productId={product.id}
+              productName={product.name}
+              initialWished={wishlistIds.has(product.id)}
+            />
           </div>
         </div>
       </div>
@@ -98,7 +109,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
           </h2>
           <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-4">
             {related.map((p) => (
-              <ProductCard key={p.id} product={p} />
+              <ProductCard
+                key={p.id}
+                product={p}
+                wished={wishlistIds.has(p.id)}
+              />
             ))}
           </div>
         </section>

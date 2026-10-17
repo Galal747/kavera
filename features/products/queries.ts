@@ -190,3 +190,19 @@ export async function getProducts({
     totalPages: Math.max(1, Math.ceil(total / pageSize)),
   };
 }
+
+// بتجيب منتجات حسب قايمة IDs وبتحافظ على ترتيب القايمة.
+// الـ RLS بتخفي المنتجات غير النشطة، فهما بيختفوا من النتيجة لوحدهم.
+export async function getProductsByIds(ids: string[]): Promise<Product[]> {
+  if (ids.length === 0) return [];
+
+  const supabase = await createClient();
+  const { data, error } = await baseQuery(supabase).in("id", ids);
+  if (error) throw new Error(error.message);
+
+  const byId = new Map((data ?? []).map((row) => [row.id, toProduct(row)]));
+  return ids.flatMap((id) => {
+    const product = byId.get(id);
+    return product ? [product] : [];
+  });
+}

@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import type { Database } from "@/types/database";
 
-const PROTECTED_PREFIXES = ["/account", "/admin", "/cart"];
+const PROTECTED_PREFIXES = ["/account", "/admin", "/cart", "/wishlist"];
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
 
@@ -50,3 +50,4 @@ export const config = {
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
+

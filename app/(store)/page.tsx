@@ -6,6 +6,7 @@ import {
     getBestSellers,
     getNewArrivals,
 } from "@/features/products/queries";
+import { getWishlistProductIds } from "@/features/wishlist/queries";
 
 const collections = [
     { label: "Oversized Tees", href: "/shop?category=oversized" },
@@ -14,10 +15,11 @@ const collections = [
 ];
 
 export default async function HomePage() {
-    const [newArrivals, bestSellers] = await Promise.all([
-        getNewArrivals(),
-        getBestSellers(),
-    ]);
+      const [newArrivals, bestSellers, wishlistIds] = await Promise.all([
+    getNewArrivals(),
+    getBestSellers(),
+    getWishlistProductIds(),
+  ]);
 
     return (
         <>
@@ -77,7 +79,7 @@ export default async function HomePage() {
                 </div>
                 <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-4">
                     {newArrivals.map((p) => (
-                        <ProductCard key={p.id} product={p} />
+                        <ProductCard key={p.id} product={p} wished={wishlistIds.has(p.id)} />
                     ))}
                 </div>
             </section>

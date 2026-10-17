@@ -1,72 +1,89 @@
 import Image from "next/image";
 import Link from "next/link";
+import { WishlistButton } from "@/features/wishlist/components/wishlist-button";
 import { formatPrice } from "@/lib/format";
 import type { Product } from "@/types/product";
 
 const CARD_SIZES = "(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw";
 
-export function ProductCard({ product }: { product: Product }) {
+type ProductCardProps = {
+  product: Product;
+  wished?: boolean;
+};
+
+export function ProductCard({ product, wished = false }: ProductCardProps) {
   const [mainImage, hoverImage] = product.images;
 
   return (
-    <Link
-      href={`/product/${product.slug}`}
-      className="group block focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-neutral-950"
-    >
-      <div className="relative aspect-[3/4] overflow-hidden bg-neutral-200">
-        {mainImage ? (
-          <>
-            <Image
-              src={mainImage}
-              alt={product.name}
-              fill
-              sizes={CARD_SIZES}
-              className="object-cover"
-            />
-            {/* الصورة التانية بتظهر عند الـ hover (لو موجودة) */}
-            {hoverImage && (
+    <div className="group relative">
+      <Link
+        href={`/product/${product.slug}`}
+        className="block focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-neutral-950"
+      >
+        <div className="relative aspect-[3/4] overflow-hidden bg-neutral-200">
+          {mainImage ? (
+            <>
               <Image
-                src={hoverImage}
-                alt=""
-                aria-hidden="true"
+                src={mainImage}
+                alt={product.name}
                 fill
                 sizes={CARD_SIZES}
-                className="object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                className="object-cover"
               />
-            )}
-          </>
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center text-sm uppercase tracking-widest text-neutral-400">
-            No image
-          </div>
-        )}
+              {hoverImage && (
+                <Image
+                  src={hoverImage}
+                  alt=""
+                  aria-hidden="true"
+                  fill
+                  sizes={CARD_SIZES}
+                  className="object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                />
+              )}
+            </>
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center text-sm uppercase tracking-widest text-neutral-400">
+              No image
+            </div>
+          )}
 
-        {product.isNew && (
-          <span className="absolute left-3 top-3 bg-neutral-950 px-2 py-1 text-xs uppercase tracking-wider text-white">
-            New
-          </span>
-        )}
-        {!product.inStock && (
-          <span className="absolute right-3 top-3 bg-white px-2 py-1 text-xs uppercase tracking-wider text-neutral-950">
-            Sold out
-          </span>
-        )}
-      </div>
-
-      <div className="mt-3 space-y-1">
-        <h3 className="text-sm font-medium text-neutral-950">{product.name}</h3>
-        <p className="text-sm text-neutral-600">{formatPrice(product.price)}</p>
-        <div className="flex gap-1.5 pt-1">
-          {product.colors.map((hex) => (
-            <span
-              key={hex}
-              className="h-3 w-3 rounded-full border border-neutral-300"
-              style={{ backgroundColor: hex }}
-              aria-hidden="true"
-            />
-          ))}
+          {product.isNew && (
+            <span className="absolute left-3 top-3 bg-neutral-950 px-2 py-1 text-xs uppercase tracking-wider text-white">
+              New
+            </span>
+          )}
+          {!product.inStock && (
+            <span className="absolute bottom-3 left-3 bg-white px-2 py-1 text-xs uppercase tracking-wider text-neutral-950">
+              Sold out
+            </span>
+          )}
         </div>
-      </div>
-    </Link>
+
+        <div className="mt-3 space-y-1">
+          <h3 className="text-sm font-medium text-neutral-950">
+            {product.name}
+          </h3>
+          <p className="text-sm text-neutral-600">
+            {formatPrice(product.price)}
+          </p>
+          <div className="flex gap-1.5 pt-1">
+            {product.colors.map((hex) => (
+              <span
+                key={hex}
+                className="h-3 w-3 rounded-full border border-neutral-300"
+                style={{ backgroundColor: hex }}
+                aria-hidden="true"
+              />
+            ))}
+          </div>
+        </div>
+      </Link>
+
+      <WishlistButton
+        productId={product.id}
+        productName={product.name}
+        initialWished={wished}
+      />
+    </div>
   );
 }
