@@ -29,6 +29,9 @@ export default async function AccountPage() {
             </p>
             <p className="text-sm text-neutral-500">{user.email}</p>
             <nav className="mt-8 flex flex-col gap-2 text-sm">
+                <Link href="/account/orders" className="underline underline-offset-4">
+                    My orders
+                </Link>
                 <Link href="/account/addresses" className="underline underline-offset-4">
                     Saved addresses
                 </Link>

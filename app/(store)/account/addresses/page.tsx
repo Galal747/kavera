@@ -1,32 +1,13 @@
 import Link from "next/link";
 import { AddressesManager } from "@/features/addresses/components/addresses-manager";
+import { getAddresses } from "@/features/addresses/queries";
 import { requireUser } from "@/lib/auth";
-import { createClient } from "@/lib/supabase/server";
 
 export const metadata = { title: "Addresses | Atelier Cairo" };
 
 export default async function AddressesPage() {
-  await requireUser("/account/addresses");
-
-  // الـ RLS بترجّع عناوين المستخدم الحالي بس
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("addresses")
-    .select("id, full_name, phone, governorate, city, street, notes, is_default")
-    .order("is_default", { ascending: false })
-    .order("created_at", { ascending: false });
-  if (error) throw new Error(error.message);
-
-  const addresses = (data ?? []).map((a) => ({
-    id: a.id,
-    fullName: a.full_name,
-    phone: a.phone,
-    governorate: a.governorate,
-    city: a.city,
-    street: a.street,
-    notes: a.notes,
-    isDefault: a.is_default,
-  }));
+  const user = await requireUser("/account/addresses");
+  const addresses = await getAddresses(user.id);
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 md:px-6">

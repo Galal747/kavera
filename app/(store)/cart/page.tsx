@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Button, buttonVariants } from "@/components/ui/button"; import { CartLineItem } from "@/features/cart/components/cart-line-item";
+import { Button, buttonVariants } from "@/components/ui/button"; 
+import { CartLineItem } from "@/features/cart/components/cart-line-item";
 import { getCart } from "@/features/cart/queries";
 import { requireUser } from "@/lib/auth";
 import { formatPrice } from "@/lib/format";
@@ -19,7 +20,7 @@ export default async function CartPage() {
             {cart.lines.length === 0 ? (
                 <div className="mt-16 text-center">
                     <p className="text-neutral-600">Your cart is empty.</p>
-                    <Link href="..." className={buttonVariants({ className: "mt-6" })}>
+                    <Link href="/shop" className={buttonVariants({ className: "mt-6" })}>
                         Continue shopping
                     </Link>
                 </div>
@@ -50,9 +51,18 @@ export default async function CartPage() {
                                 Fix the items marked above before checking out.
                             </p>
                         )}
-                        <Button className="w-full" size="lg" disabled>
-                            Checkout (coming soon)
-                        </Button>
+                        {cart.hasProblems ? (
+                            <Button className="w-full" size="lg" disabled>
+                                Checkout
+                            </Button>
+                        ) : (
+                            <Link 
+                                href="/checkout" 
+                                className={buttonVariants({ className: "w-full", size: "lg" })}
+                            >
+                                Checkout
+                            </Link>
+                        )}
                     </aside>
                 </div>
             )}

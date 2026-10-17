@@ -2,7 +2,13 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import type { Database } from "@/types/database";
 
-const PROTECTED_PREFIXES = ["/account", "/admin", "/cart", "/wishlist"];
+const PROTECTED_PREFIXES = [
+  "/account",
+  "/admin",
+  "/cart",
+  "/wishlist",
+  "/checkout",
+];
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
 
