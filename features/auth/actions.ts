@@ -2,8 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { loginSchema, registerSchema } from "./schemas";
-
+import { forgotPasswordSchema, loginSchema, registerSchema, resetPasswordSchema } from "./schemas";
 export type AuthResult = { error?: string; message?: string } | undefined;
 
 // نمنع open redirect: نقبل مسار داخلي بس
@@ -68,4 +67,51 @@ export async function logoutAction() {
   const supabase = await createClient();
   await supabase.auth.signOut();
   redirect("/");
+}
+
+export async function forgotPasswordAction(
+  input: unknown,
+): Promise<AuthResult> {
+  const parsed = forgotPasswordSchema.safeParse(input);
+  if (!parsed.success) {
+    return { error: "Please enter a valid email address." };
+  }
+
+  const supabase = await createClient();
+  await supabase.auth.resetPasswordForEmail(parsed.data.email, {
+    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback?next=/reset-password`,
+  });
+
+  // نفس الرد دايمًا، سواء الإيميل موجود أو لأ
+  return {
+    message: "If an account exists for that email, we sent a reset link.",
+  };
+}
+
+export async function resetPasswordAction(
+  input: unknown,
+): Promise<AuthResult> {
+  const parsed = resetPasswordSchema.safeParse(input);
+  if (!parsed.success) {
+    return { error: "Please check the form and try again." };
+  }
+
+  const supabase = await createClient();
+
+  // لازم يكون فيه جلسة (جت من لينك الإيميل)
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { error: "This reset link has expired. Please request a new one." };
+  }
+
+  const { error } = await supabase.auth.updateUser({
+    password: parsed.data.password,
+  });
+  if (error) {
+    return { error: "Could not update the password. Try a different one." };
+  }
+
+  redirect("/account");
 }

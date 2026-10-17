@@ -11,74 +11,83 @@ import { loginAction } from "../actions";
 import { loginSchema, type LoginValues } from "../schemas";
 
 export function LoginForm({ next }: { next?: string }) {
-  const [serverError, setServerError] = useState<string | null>(null);
+    const [serverError, setServerError] = useState<string | null>(null);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<LoginValues>({ resolver: zodResolver(loginSchema) });
+    const {
+        register,
+        handleSubmit,
+        formState: { errors, isSubmitting },
+    } = useForm<LoginValues>({ resolver: zodResolver(loginSchema) });
 
-  async function onSubmit(values: LoginValues) {
-    setServerError(null);
-    const result = await loginAction(values, next);
-    if (result?.error) setServerError(result.error);
-  }
+    async function onSubmit(values: LoginValues) {
+        setServerError(null);
+        const result = await loginAction(values, next);
+        if (result?.error) setServerError(result.error);
+    }
 
-  return (
-    <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
-      <h1 className="font-[family-name:var(--font-display)] text-2xl uppercase">
-        Sign in
-      </h1>
+    return (
+        <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
+            <h1 className="font-[family-name:var(--font-display)] text-2xl uppercase">
+                Sign in
+            </h1>
 
-      <div className="space-y-1.5">
-        <Label htmlFor="email">Email</Label>
-        <Input
-          id="email"
-          type="email"
-          autoComplete="email"
-          aria-invalid={errors.email ? "true" : "false"}
-          {...register("email")}
-        />
-        {errors.email && (
-          <p className="text-sm text-red-600" role="alert">
-            {errors.email.message}
-          </p>
-        )}
-      </div>
+            <div className="space-y-1.5">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                    id="email"
+                    type="email"
+                    autoComplete="email"
+                    aria-invalid={errors.email ? "true" : "false"}
+                    {...register("email")}
+                />
+                {errors.email && (
+                    <p className="text-sm text-red-600" role="alert">
+                        {errors.email.message}
+                    </p>
+                )}
+            </div>
 
-      <div className="space-y-1.5">
-        <Label htmlFor="password">Password</Label>
-        <Input
-          id="password"
-          type="password"
-          autoComplete="current-password"
-          aria-invalid={errors.password ? "true" : "false"}
-          {...register("password")}
-        />
-        {errors.password && (
-          <p className="text-sm text-red-600" role="alert">
-            {errors.password.message}
-          </p>
-        )}
-      </div>
+            <div className="space-y-1.5">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                    id="password"
+                    type="password"
+                    autoComplete="current-password"
+                    aria-invalid={errors.password ? "true" : "false"}
+                    {...register("password")}
+                />
 
-      {serverError && (
-        <p className="text-sm text-red-600" role="alert">
-          {serverError}
-        </p>
-      )}
+                <div className="text-right">
+                    <Link
+                        href="/forgot-password"
+                        className="text-sm text-neutral-600 underline underline-offset-4"
+                    >
+                        Forgot password?
+                    </Link>
+                </div>
+                {errors.password && (
+                    <p className="text-sm text-red-600" role="alert">
+                        {errors.password.message}
+                    </p>
+                )}
+            </div>
 
-      <Button type="submit" className="w-full" disabled={isSubmitting}>
-        {isSubmitting ? "Signing in..." : "Sign in"}
-      </Button>
+            {serverError && (
+                <p className="text-sm text-red-600" role="alert">
+                    {serverError}
+                </p>
+            )}
 
-      <p className="text-center text-sm text-neutral-600">
-        New here?{" "}
-        <Link href="/register" className="underline underline-offset-4">
-          Create an account
-        </Link>
-      </p>
-    </form>
-  );
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+                {isSubmitting ? "Signing in..." : "Sign in"}
+            </Button>
+
+            <p className="text-center text-sm text-neutral-600">
+                New here?{" "}
+                <Link href="/register" className="underline underline-offset-4">
+                    Create an account
+                </Link>
+            </p>
+        </form>
+    );
 }
