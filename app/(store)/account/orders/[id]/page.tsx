@@ -11,15 +11,7 @@ import { requireUser } from "@/lib/auth";
 import { formatDateTime, formatPrice } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
 
-// نسخة العنوان اللي اتخزنت مع الطلب (JSON). نتحقق من شكلها قبل ما نعرضها.
-const addressSnapshotSchema = z.object({
-  full_name: z.string(),
-  phone: z.string(),
-  governorate: z.string(),
-  city: z.string(),
-  street: z.string(),
-  notes: z.string().nullable().optional(),
-});
+import { addressSnapshotSchema } from "@/features/orders/address-snapshot";
 
 type Props = {
   params: Promise<{ id: string }>;

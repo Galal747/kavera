@@ -604,6 +604,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_update_order_status: {
+        Args: { p_new_status: string; p_order_id: string }
+        Returns: undefined
+      }
       create_order: {
         Args: {
           p_address_id: string

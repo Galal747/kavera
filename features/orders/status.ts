@@ -33,3 +33,33 @@ export const paymentStatusLabel = (s: string) => PAYMENT_STATUS_LABELS[s] ?? s;
 export const paymentMethodLabel = (s: string) => PAYMENT_METHOD_LABELS[s] ?? s;
 export const orderStatusStyle = (s: string) =>
   STATUS_STYLES[s] ?? "bg-neutral-200 text-neutral-700";
+export const ORDER_STATUSES = [
+  "pending",
+  "confirmed",
+  "processing",
+  "shipped",
+  "delivered",
+  "cancelled",
+] as const;
+
+export type OrderStatus = (typeof ORDER_STATUSES)[number];
+
+// نفس قواعد الـ database. هنا لإخفاء الأزرار بس،
+// والـ database هي اللي بتفرض القاعدة فعلًا.
+export const NEXT_STATUSES: Record<OrderStatus, OrderStatus[]> = {
+  pending: ["confirmed", "cancelled"],
+  confirmed: ["processing", "cancelled"],
+  processing: ["shipped", "cancelled"],
+  shipped: ["delivered"],
+  delivered: [],
+  cancelled: [],
+};
+
+export const ACTION_LABELS: Record<OrderStatus, string> = {
+  pending: "Mark as pending",
+  confirmed: "Confirm order",
+  processing: "Start processing",
+  shipped: "Mark as shipped",
+  delivered: "Mark as delivered",
+  cancelled: "Cancel order",
+};
