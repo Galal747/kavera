@@ -24,6 +24,12 @@ export default async function AdminLayout({
                             <Link href="/admin/orders" className="hover:underline">
                                 Orders
                             </Link>
+                            <Link href="/admin/coupons" className="hover:underline">
+                                Coupons
+                            </Link>
+                            <Link href="/admin/customers" className="hover:underline">
+                                Customers
+                            </Link>
                         </nav>
                     </div>
                     <Link href="/" className="text-sm underline underline-offset-4">

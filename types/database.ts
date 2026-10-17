@@ -604,6 +604,20 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_dashboard_stats: { Args: { p_days?: number }; Returns: Json }
+      admin_list_customers: {
+        Args: { p_limit?: number; p_offset?: number; p_search?: string }
+        Returns: {
+          customer_id: string
+          customer_name: string
+          customer_role: string
+          joined_at: string
+          last_order_at: string
+          orders_count: number
+          total_count: number
+          total_spent: number
+        }[]
+      }
       admin_update_order_status: {
         Args: { p_new_status: string; p_order_id: string }
         Returns: undefined
