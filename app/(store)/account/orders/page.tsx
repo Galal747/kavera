@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Button, buttonVariants } from "@/components/ui/button";import {
+import { buttonVariants } from "@/components/ui/button";import {
   orderStatusLabel,
   orderStatusStyle,
 } from "@/features/orders/status";
@@ -31,7 +31,7 @@ export default async function OrdersPage() {
       >
         ← Back to account
       </Link>
-      <h1 className="mb-8 mt-3 font-[family-name:var(--font-display)] text-4xl uppercase tracking-tight">
+      <h1 className="mb-8 mt-3 font-(family-name:--font-display) text-4xl uppercase tracking-tight">
         My orders
       </h1>
 
