@@ -11,7 +11,7 @@ export default async function AdminLayout({
             <header className="border-b border-neutral-200 bg-white">
                 <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 md:px-6">
                     <div className="flex items-center gap-6">
-                        <span className="font-[family-name:var(--font-display)] text-lg uppercase">
+                        <span className="font-(family-name:--font-display) text-lg uppercase">
                             Atelier Cairo · Admin
                         </span>
                         <nav className="flex gap-4 text-sm">

@@ -155,6 +155,208 @@ export type Database = {
         }
         Relationships: []
       }
+      coupons: {
+        Row: {
+          code: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          min_order: number
+          starts_at: string | null
+          type: string
+          usage_limit: number | null
+          used_count: number
+          value: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          min_order?: number
+          starts_at?: string | null
+          type: string
+          usage_limit?: number | null
+          used_count?: number
+          value: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          min_order?: number
+          starts_at?: string | null
+          type?: string
+          usage_limit?: number | null
+          used_count?: number
+          value?: number
+        }
+        Relationships: []
+      }
+      order_items: {
+        Row: {
+          color_name: string
+          id: string
+          line_total: number
+          order_id: string
+          product_name: string
+          quantity: number
+          size_name: string
+          sku: string
+          unit_price: number
+          variant_id: string
+        }
+        Insert: {
+          color_name: string
+          id?: string
+          line_total: number
+          order_id: string
+          product_name: string
+          quantity: number
+          size_name: string
+          sku: string
+          unit_price: number
+          variant_id: string
+        }
+        Update: {
+          color_name?: string
+          id?: string
+          line_total?: number
+          order_id?: string
+          product_name?: string
+          quantity?: number
+          size_name?: string
+          sku?: string
+          unit_price?: number
+          variant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          coupon_code: string | null
+          coupon_id: string | null
+          created_at: string
+          discount: number
+          id: string
+          idempotency_key: string
+          order_number: number
+          payment_method: string
+          payment_status: string
+          shipping_address: Json
+          shipping_fee: number
+          status: string
+          subtotal: number
+          total: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          coupon_code?: string | null
+          coupon_id?: string | null
+          created_at?: string
+          discount?: number
+          id?: string
+          idempotency_key: string
+          order_number?: never
+          payment_method: string
+          payment_status?: string
+          shipping_address: Json
+          shipping_fee: number
+          status?: string
+          subtotal: number
+          total: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          coupon_code?: string | null
+          coupon_id?: string | null
+          created_at?: string
+          discount?: number
+          id?: string
+          idempotency_key?: string
+          order_number?: never
+          payment_method?: string
+          payment_status?: string
+          shipping_address?: Json
+          shipping_fee?: number
+          status?: string
+          subtotal?: number
+          total?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_coupon_id_fkey"
+            columns: ["coupon_id"]
+            isOneToOne: false
+            referencedRelation: "coupons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payments: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          order_id: string
+          provider: string
+          provider_ref: string | null
+          raw_payload: Json | null
+          status: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          order_id: string
+          provider: string
+          provider_ref?: string | null
+          raw_payload?: Json | null
+          status?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          order_id?: string
+          provider?: string
+          provider_ref?: string | null
+          raw_payload?: Json | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       product_images: {
         Row: {
           color_id: string | null
@@ -320,6 +522,21 @@ export type Database = {
         }
         Relationships: []
       }
+      shipping_rates: {
+        Row: {
+          fee: number
+          governorate: string
+        }
+        Insert: {
+          fee: number
+          governorate: string
+        }
+        Update: {
+          fee?: number
+          governorate?: string
+        }
+        Relationships: []
+      }
       sizes: {
         Row: {
           id: string
@@ -335,6 +552,21 @@ export type Database = {
           id?: string
           name?: string
           sort_order?: number
+        }
+        Relationships: []
+      }
+      store_settings: {
+        Row: {
+          free_shipping_threshold: number
+          id: boolean
+        }
+        Insert: {
+          free_shipping_threshold?: number
+          id?: boolean
+        }
+        Update: {
+          free_shipping_threshold?: number
+          id?: boolean
         }
         Relationships: []
       }
@@ -372,7 +604,28 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_order: {
+        Args: {
+          p_address_id: string
+          p_coupon_code?: string
+          p_idempotency_key: string
+          p_payment_method?: string
+        }
+        Returns: string
+      }
       is_admin: { Args: never; Returns: boolean }
+      preview_order: {
+        Args: { p_address_id: string; p_coupon_code?: string }
+        Returns: Json
+      }
+      quote_order: {
+        Args: {
+          p_coupon_code: string
+          p_governorate: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
       set_default_address: {
         Args: { p_address_id: string }
         Returns: undefined

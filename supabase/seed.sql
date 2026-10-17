@@ -49,3 +49,10 @@ join public.colors c on c.name = cl.name;
 
 update public.products set is_new = true
 where slug in ('cairo-oversized-tee-black', 'nile-heavy-hoodie', 'delta-zip-hoodie');
+
+insert into public.coupons (code, type, value, min_order) values
+  ('WELCOME10', 'percent', 10, 500),
+  ('SAVE100', 'fixed', 100, 800);
+
+insert into public.coupons (code, type, value, expires_at) values
+  ('OLD5', 'percent', 5, now() - interval '1 day');

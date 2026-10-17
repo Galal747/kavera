@@ -6,7 +6,6 @@ import Link from "next/link";
 export default async function AccountPage() {
     const supabase = await createClient();
 
-    // نتأكد من المستخدم هنا كمان، مش بس في الـ proxy
     const {
         data: { user },
     } = await supabase.auth.getUser();
@@ -22,7 +21,7 @@ export default async function AccountPage() {
 
     return (
         <div className="mx-auto max-w-3xl px-4 py-10 md:px-6">
-            <h1 className="font-[family-name:var(--font-display)] text-4xl uppercase tracking-tight">
+            <h1 className="font-(family-name:--font-display) text-4xl uppercase tracking-tight">
                 My account
             </h1>
             <p className="mt-4 text-neutral-700">
