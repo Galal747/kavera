@@ -13,3 +13,11 @@ export async function getRelatedProducts(
     .filter((p) => p.category === product.category && p.id !== product.id)
     .slice(0, limit);
 }
+
+export async function getNewArrivals(limit = 4): Promise<Product[]> {
+  return mockProducts.filter((p) => p.isNew).slice(0, limit);
+}
+
+export async function getBestSellers(limit = 4): Promise<Product[]> {
+  return mockProducts.filter((p) => p.inStock).slice(0, limit);
+}
