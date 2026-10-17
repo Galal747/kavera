@@ -12,10 +12,11 @@ export type Product = {
   id: string;
   slug: string;
   name: string;
+  description: string | null;
   category: ProductCategory;
-  price: number; 
+  price: number; // بالجنيه المصري
   isNew: boolean;
   inStock: boolean;
-  colors: string[]; 
+  colors: string[]; // hex
   sizes: string[];
 };

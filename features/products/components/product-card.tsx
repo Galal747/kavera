@@ -9,7 +9,7 @@ export function ProductCard({ product }: { product: Product }) {
       className="group block focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-neutral-950"
     >
       {/* مكان الصورة: placeholder لحد ما نرفع صور حقيقية */}
-      <div className="relative aspect-[3/4] overflow-hidden bg-neutral-200">
+      <div className="relative aspect-3/4 overflow-hidden bg-neutral-200">
         <div className="absolute inset-0 flex items-center justify-center text-sm uppercase tracking-widest text-neutral-400 transition-transform duration-500 group-hover:scale-105">
           Image
         </div>

@@ -45,3 +45,7 @@ cross join lateral unnest(v.sizes) as sz(name)
 cross join lateral unnest(v.colors) as cl(name)
 join public.sizes s on s.name = sz.name
 join public.colors c on c.name = cl.name;
+
+
+update public.products set is_new = true
+where slug in ('cairo-oversized-tee-black', 'nile-heavy-hoodie', 'delta-zip-hoodie');
