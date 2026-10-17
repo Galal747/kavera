@@ -8,6 +8,14 @@ export const PRODUCT_CATEGORIES = [
 
 export type ProductCategory = (typeof PRODUCT_CATEGORIES)[number];
 
+export type ProductVariant = {
+  id: string;
+  size: string;
+  colorHex: string;
+  stock: number;
+  price: number; // السعر الفعلي (price_override لو موجود، وإلا السعر الأساسي)
+};
+
 export type Product = {
   id: string;
   slug: string;
@@ -20,4 +28,5 @@ export type Product = {
   colors: string[]; // hex
   sizes: string[];
   images: string[]; // روابط كاملة، الأولى هي الرئيسية
+  variants: ProductVariant[];
 };

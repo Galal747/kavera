@@ -39,6 +39,41 @@ export type Database = {
   }
   public: {
     Tables: {
+      cart_items: {
+        Row: {
+          created_at: string
+          id: string
+          quantity: number
+          updated_at: string
+          user_id: string
+          variant_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          quantity: number
+          updated_at?: string
+          user_id: string
+          variant_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          quantity?: number
+          updated_at?: string
+          user_id?: string
+          variant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cart_items_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       categories: {
         Row: {
           created_at: string
@@ -266,7 +301,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_admin: { Args: never; Returns: boolean }
     }
     Enums: {
       [_ in never]: never

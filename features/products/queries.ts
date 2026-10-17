@@ -11,7 +11,7 @@ const PRODUCT_SELECT = `
   id, slug, name, description, base_price, is_new, created_at,
   categories!inner ( slug ),
   product_variants (
-    stock_quantity,
+    id, stock_quantity, price_override,
     sizes ( name, sort_order ),
     colors ( hex )
   ),
@@ -40,7 +40,7 @@ function toProduct(row: ProductRow): Product {
 
   const colors = [...new Set(variants.map((v) => v.colors.hex))];
 
-    return {
+  return {
     id: row.id,
     slug: row.slug,
     name: row.name,
@@ -54,6 +54,16 @@ function toProduct(row: ProductRow): Product {
     images: [...row.product_images]
       .sort((a, b) => a.position - b.position)
       .map((img) => getProductImageUrl(img.storage_path)),
+    variants: variants.map((v) => ({
+      id: v.id,
+      size: v.sizes.name,
+      colorHex: v.colors.hex,
+      stock: v.stock_quantity,
+      price:
+        v.price_override === null
+          ? Number(row.base_price)
+          : Number(v.price_override),
+    })),
   };
 }
 
