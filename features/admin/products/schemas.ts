@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+// ---------------- Product ----------------
+
 export const productSchema = z.object({
   name: z.string().trim().min(2, "Name is too short").max(120, "Name is too long"),
   slug: z
@@ -25,3 +27,33 @@ export const productSchema = z.object({
 });
 
 export type ProductFormValues = z.infer<typeof productSchema>;
+
+// ---------------- Variants ----------------
+
+const priceOverrideField = z
+  .union([
+    z.literal(""),
+    z
+      .string()
+      .trim()
+      .regex(/^\d{1,7}(\.\d{1,2})?$/, "Enter a valid price, e.g. 700"),
+  ])
+  .refine((v) => v === "" || Number(v) > 0, "Price must be greater than zero");
+
+export const variantSchema = z.object({
+  sizeId: z.uuid("Choose a size"),
+  colorId: z.uuid("Choose a color"),
+  stock: z
+    .number("Enter the stock quantity")
+    .int("Stock must be a whole number")
+    .min(0, "Stock can't be negative")
+    .max(100000, "Stock is too large"),
+  priceOverride: priceOverrideField,
+});
+
+export const variantUpdateSchema = variantSchema.pick({
+  stock: true,
+  priceOverride: true,
+});
+
+export type VariantFormValues = z.infer<typeof variantSchema>;

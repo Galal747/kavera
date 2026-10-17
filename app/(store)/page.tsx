@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
-import { Button } from "@/components/ui/button";
 import { NewsletterForm } from "@/features/home/components/newsletter-form";
 import { ProductCard } from "@/features/products/components/product-card";
 import {

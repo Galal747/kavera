@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { Button , buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Pagination } from "@/features/products/components/pagination";
 import { requireAdmin } from "@/lib/auth";
 import { formatPrice } from "@/lib/format";
@@ -20,11 +20,19 @@ type Props = {
 };
 
 function stockStatus(variantCount: number, totalStock: number) {
-  if (variantCount === 0) return { label: "No variants", style: "bg-neutral-200 text-neutral-700" };
-  if (totalStock === 0) return { label: "Out of stock", style: "bg-red-100 text-red-700" };
+  if (variantCount === 0)
+    return { label: "No variants", style: "bg-neutral-200 text-neutral-700" };
+  if (totalStock === 0)
+    return { label: "Out of stock", style: "bg-red-100 text-red-700" };
   if (totalStock <= LOW_STOCK_THRESHOLD)
-    return { label: `Low stock (${totalStock})`, style: "bg-amber-100 text-amber-800" };
-  return { label: `${totalStock} in stock`, style: "bg-emerald-100 text-emerald-800" };
+    return {
+      label: `Low stock (${totalStock})`,
+      style: "bg-amber-100 text-amber-800",
+    };
+  return {
+    label: `${totalStock} in stock`,
+    style: "bg-emerald-100 text-emerald-800",
+  };
 }
 
 export default async function AdminProductsPage({ searchParams }: Props) {
@@ -109,6 +117,7 @@ export default async function AdminProductsPage({ searchParams }: Props) {
                 <th className="px-4 py-3">Price</th>
                 <th className="px-4 py-3">Stock</th>
                 <th className="px-4 py-3">Status</th>
+                <th className="px-4 py-3"></th>
               </tr>
             </thead>
             <tbody>
@@ -120,12 +129,17 @@ export default async function AdminProductsPage({ searchParams }: Props) {
                 );
                 const stock = stockStatus(variants.length, totalStock);
                 return (
-                  <tr key={p.id} className="border-b border-neutral-100 last:border-0">
+                  <tr
+                    key={p.id}
+                    className="border-b border-neutral-100 last:border-0"
+                  >
                     <td className="px-4 py-3 font-medium">{p.name}</td>
                     <td className="px-4 py-3 text-neutral-600">
                       {p.categories?.name ?? "—"}
                     </td>
-                    <td className="px-4 py-3">{formatPrice(Number(p.base_price))}</td>
+                    <td className="px-4 py-3">
+                      {formatPrice(Number(p.base_price))}
+                    </td>
                     <td className="px-4 py-3">
                       <span className={`px-2 py-1 text-xs ${stock.style}`}>
                         {stock.label}
@@ -137,6 +151,14 @@ export default async function AdminProductsPage({ searchParams }: Props) {
                       ) : (
                         <span className="text-neutral-500">Hidden</span>
                       )}
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <Link
+                        href={`/admin/products/${p.id}/edit`}
+                        className="underline underline-offset-4"
+                      >
+                        Edit
+                      </Link>
                     </td>
                   </tr>
                 );

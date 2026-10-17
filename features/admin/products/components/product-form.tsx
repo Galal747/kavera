@@ -7,13 +7,32 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { slugify } from "@/lib/slug";
-import { createProductAction } from "../actions";
-import { productSchema, type ProductFormValues } from "../schemas";
+import { createProductAction, updateProductAction } from "@/features/admin/products/actions";
+import { productSchema, type ProductFormValues } from "@/features/admin/products/schemas";
 
 type Category = { id: string; name: string };
 
-export function ProductForm({ categories }: { categories: Category[] }) {
+type ProductFormProps = {
+  categories: Category[];
+  // لو موجود: وضع التعديل
+  product?: { id: string; values: ProductFormValues };
+};
+
+const emptyValues: ProductFormValues = {
+  name: "",
+  slug: "",
+  description: "",
+  price: "",
+  categoryId: "",
+  isActive: true,
+  isFeatured: false,
+  isNew: false,
+};
+
+export function ProductForm({ categories, product }: ProductFormProps) {
   const [serverError, setServerError] = useState<string | null>(null);
+  const [saved, setSaved] = useState(false);
+  const isEdit = Boolean(product);
 
   const {
     register,
@@ -22,24 +41,21 @@ export function ProductForm({ categories }: { categories: Category[] }) {
     formState: { errors, isSubmitting, dirtyFields },
   } = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
-    defaultValues: {
-      name: "",
-      slug: "",
-      description: "",
-      price: "",
-      categoryId: "",
-      isActive: true,
-      isFeatured: false,
-      isNew: false,
-    },
+    defaultValues: product?.values ?? emptyValues,
   });
 
   const nameField = register("name");
 
   async function onSubmit(values: ProductFormValues) {
     setServerError(null);
-    const result = await createProductAction(values);
+    setSaved(false);
+
+    const result = product
+      ? await updateProductAction(product.id, values)
+      : await createProductAction(values);
+
     if (result?.error) setServerError(result.error);
+    if (result?.ok) setSaved(true);
   }
 
   return (
@@ -56,8 +72,8 @@ export function ProductForm({ categories }: { categories: Category[] }) {
           {...nameField}
           onChange={(e) => {
             nameField.onChange(e);
-            // نولّد الـ slug تلقائي طالما الأدمن ماعدّلوش بنفسه
-            if (!dirtyFields.slug) {
+            // الـ slug التلقائي في الإنشاء بس. في التعديل مابنغيّرش الرابط لوحدنا.
+            if (!isEdit && !dirtyFields.slug) {
               setValue("slug", slugify(e.target.value), {
                 shouldValidate: true,
               });
@@ -81,6 +97,12 @@ export function ProductForm({ categories }: { categories: Category[] }) {
         {errors.slug && (
           <p className="text-sm text-red-600" role="alert">
             {errors.slug.message}
+          </p>
+        )}
+        {isEdit && (
+          <p className="text-xs text-neutral-500">
+            Changing the slug changes the product link. Old links will stop
+            working.
           </p>
         )}
       </div>
@@ -161,9 +183,18 @@ export function ProductForm({ categories }: { categories: Category[] }) {
           {serverError}
         </p>
       )}
+      {saved && (
+        <p className="text-sm text-emerald-700" role="status">
+          Changes saved.
+        </p>
+      )}
 
       <Button type="submit" disabled={isSubmitting}>
-        {isSubmitting ? "Saving..." : "Create product"}
+        {isSubmitting
+          ? "Saving..."
+          : isEdit
+            ? "Save changes"
+            : "Create product"}
       </Button>
     </form>
   );
