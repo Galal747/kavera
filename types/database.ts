@@ -322,6 +322,8 @@ export type Database = {
           created_at: string
           id: string
           order_id: string
+          paymob_order_id: number | null
+          paymob_transaction_id: number | null
           provider: string
           provider_ref: string | null
           raw_payload: Json | null
@@ -332,6 +334,8 @@ export type Database = {
           created_at?: string
           id?: string
           order_id: string
+          paymob_order_id?: number | null
+          paymob_transaction_id?: number | null
           provider: string
           provider_ref?: string | null
           raw_payload?: Json | null
@@ -342,6 +346,8 @@ export type Database = {
           created_at?: string
           id?: string
           order_id?: string
+          paymob_order_id?: number | null
+          paymob_transaction_id?: number | null
           provider?: string
           provider_ref?: string | null
           raw_payload?: Json | null
@@ -621,6 +627,17 @@ export type Database = {
       admin_update_order_status: {
         Args: { p_new_status: string; p_order_id: string }
         Returns: undefined
+      }
+      apply_paymob_transaction: {
+        Args: {
+          p_amount_cents: number
+          p_currency: string
+          p_outcome: string
+          p_paymob_order_id: number
+          p_paymob_transaction_id: number
+          p_summary: Json
+        }
+        Returns: string
       }
       create_order: {
         Args: {
