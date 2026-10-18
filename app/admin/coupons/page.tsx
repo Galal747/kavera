@@ -18,8 +18,9 @@ export default async function AdminCouponsPage() {
     .order("created_at", { ascending: false });
   if (error) throw new Error(error.message);
 
-  const now = Date.now();
-
+// eslint-disable-next-line react-hooks/purity
+    const now = Date.now();
+    
   const coupons: CouponRow[] = (data ?? []).map((c) => {
     let status: CouponStatus = "active";
     if (!c.is_active) status = "inactive";
