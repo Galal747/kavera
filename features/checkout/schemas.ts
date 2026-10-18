@@ -9,5 +9,5 @@ export const placeOrderSchema = z.object({
   idempotencyKey: z.uuid(),
   addressId: z.uuid(),
   couponCode: z.string().trim().max(30),
-  paymentMethod: z.literal("cod"),
+    paymentMethod: z.enum(["cod", "card"]),
 });

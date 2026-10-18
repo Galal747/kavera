@@ -26,9 +26,10 @@ type PreviewState = {
 type CheckoutFormProps = {
   addresses: AddressRow[];
   lines: CartLine[];
+  cardEnabled: boolean;
 };
 
-export function CheckoutForm({ addresses, lines }: CheckoutFormProps) {
+export function CheckoutForm({ addresses, lines, cardEnabled }: CheckoutFormProps) {
   const router = useRouter();
 
   const [chosenId, setChosenId] = useState("");
@@ -40,6 +41,8 @@ export function CheckoutForm({ addresses, lines }: CheckoutFormProps) {
   const [placeError, setPlaceError] = useState<string | null>(null);
   const [placing, startPlacing] = useTransition();
   const idempotencyKeyRef = useRef<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<"cod" | "card">("cod");
+  const [redirecting, setRedirecting] = useState(false);
 
   // العنوان المختار: اللي اخترته لو لسه موجود، وإلا الافتراضي، وإلا أول واحد
   const selectedId = addresses.some((a) => a.id === chosenId)
@@ -111,14 +114,22 @@ export function CheckoutForm({ addresses, lines }: CheckoutFormProps) {
         idempotencyKey,
         addressId: selectedId,
         couponCode: appliedCode,
-        paymentMethod: "cod",
+        paymentMethod,
       });
+
+      if (result && "paymentUrl" in result) {
+        // بنقفل الزرار لحد ما الصفحة تتغيّر، عشان ما نفتحش دفع مرتين
+        setRedirecting(true);
+        window.location.assign(result.paymentUrl);
+        return;
+      }
 
       if (result?.needsLogin) {
         router.push("/login?next=/checkout");
         return;
       }
-      // لو نجح، الـ action بتحوّلنا لصفحة الطلب
+      
+      // لو COD نجح، الـ action بتحوّلنا لصفحة الطلب
       if (result?.error) setPlaceError(result.error);
     });
   }
@@ -215,9 +226,23 @@ export function CheckoutForm({ addresses, lines }: CheckoutFormProps) {
           <h2 className="font-[family-name:var(--font-display)] text-2xl uppercase">
             Payment
           </h2>
-          <div className="space-y-3">
-            <label className="flex gap-3 border border-neutral-950 p-4 text-sm">
-              <input type="radio" name="payment" checked readOnly className="mt-1" />
+          <fieldset className="space-y-3">
+            <legend className="sr-only">Choose a payment method</legend>
+            <label
+              className={`flex cursor-pointer gap-3 border p-4 text-sm ${
+                paymentMethod === "cod"
+                  ? "border-neutral-950"
+                  : "border-neutral-200"
+              }`}
+            >
+              <input
+                type="radio"
+                name="payment"
+                value="cod"
+                checked={paymentMethod === "cod"}
+                onChange={() => setPaymentMethod("cod")}
+                className="mt-1"
+              />
               <span>
                 <span className="block font-medium">Cash on delivery</span>
                 <span className="block text-neutral-600">
@@ -225,14 +250,34 @@ export function CheckoutForm({ addresses, lines }: CheckoutFormProps) {
                 </span>
               </span>
             </label>
-            <label className="flex gap-3 border border-neutral-200 p-4 text-sm text-neutral-400">
-              <input type="radio" name="payment" disabled className="mt-1" />
+            <label
+              className={`flex gap-3 border p-4 text-sm ${
+                cardEnabled ? "cursor-pointer" : "text-neutral-400"
+              } ${
+                paymentMethod === "card"
+                  ? "border-neutral-950"
+                  : "border-neutral-200"
+              }`}
+            >
+              <input
+                type="radio"
+                name="payment"
+                value="card"
+                disabled={!cardEnabled}
+                checked={paymentMethod === "card"}
+                onChange={() => setPaymentMethod("card")}
+                className="mt-1"
+              />
               <span>
                 <span className="block font-medium">Card payment</span>
-                <span className="block">Coming soon.</span>
+                <span className="block">
+                  {cardEnabled
+                    ? "Pay by debit or credit card. You'll be redirected to our payment partner. We never see your card details."
+                    : "Not available right now."}
+                </span>
               </span>
             </label>
-          </div>
+          </fieldset>
         </section>
       </div>
 
@@ -363,17 +408,22 @@ export function CheckoutForm({ addresses, lines }: CheckoutFormProps) {
           size="lg"
           className="w-full"
           onClick={placeOrder}
-          disabled={placing || loading || !quote || !selectedId}
+          disabled={placing || redirecting || loading || !quote || !selectedId}
         >
-          {placing
-            ? "Placing order..."
+          {placing || redirecting
+            ? paymentMethod === "card"
+              ? "Redirecting to payment..."
+              : "Placing order..."
             : quote
-              ? `Place order · ${formatPrice(quote.total)}`
+              ? paymentMethod === "card"
+                ? `Pay ${formatPrice(quote.total)}`
+                : `Place order · ${formatPrice(quote.total)}`
               : "Place order"}
         </Button>
         <p className="text-xs text-neutral-500">
-          You&apos;ll pay in cash on delivery. The final total is confirmed by
-          our server when the order is placed.
+          {paymentMethod === "card"
+            ? "Your items are reserved for about an hour while you pay. The final total is confirmed by our server."
+            : "You'll pay in cash on delivery. The final total is confirmed by our server when the order is placed."}
         </p>
       </aside>
     </div>

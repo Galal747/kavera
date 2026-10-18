@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { getPaymobConfig } from "@/features/payments/config";
+import { startCardPayment } from "@/features/payments/server";
 import { createClient } from "@/lib/supabase/server";
 import { mapOrderError } from "./errors";
 import { placeOrderSchema, previewSchema } from "./schemas";
@@ -21,9 +23,9 @@ export type PreviewResult =
 
 export type PlaceOrderResult =
   | { error: string; needsLogin?: boolean }
+  | { paymentUrl: string }
   | undefined;
 
-// الرد بتاع الـ database: نتحقق من شكله بدل ما نصدّقه
 const quoteSchema = z.object({
   subtotal: z.number(),
   discount: z.number(),
@@ -34,7 +36,6 @@ const quoteSchema = z.object({
 
 const GENERIC_ERROR = "Something went wrong. Please try again.";
 
-// معاينة الحساب. مفيش فيها كتابة، والـ DB هي اللي بتحسب.
 export async function previewOrderAction(
   input: unknown,
 ): Promise<PreviewResult> {
@@ -62,12 +63,20 @@ export async function previewOrderAction(
   };
 }
 
-// إنشاء الطلب. بنبعت: عنوان، كوبون، طريقة دفع، ومفتاح منع التكرار. مفيش أي رقم.
 export async function placeOrderAction(
   input: unknown,
 ): Promise<PlaceOrderResult> {
   const parsed = placeOrderSchema.safeParse(input);
   if (!parsed.success) return { error: "Invalid request." };
+  const { paymentMethod } = parsed.data;
+
+  // الكارت مش متاح من غير إعدادات Paymob، حتى لو حد بعت الطلب بإيده
+  if (paymentMethod === "card" && !getPaymobConfig()) {
+    return {
+      error:
+        "Card payment isn't available right now. Please choose cash on delivery.",
+    };
+  }
 
   const supabase = await createClient();
   const {
@@ -81,13 +90,20 @@ export async function placeOrderAction(
     p_idempotency_key: parsed.data.idempotencyKey,
     p_address_id: parsed.data.addressId,
     p_coupon_code: parsed.data.couponCode || undefined,
-    p_payment_method: parsed.data.paymentMethod,
+    p_payment_method: paymentMethod,
   });
 
   if (error) return { error: mapOrderError(error.message).error };
   if (!orderId) return { error: GENERIC_ERROR };
 
   revalidatePath("/", "layout");
-  // redirect بترمي exception داخلي، فمتتحطش جوه try/catch
+
+  if (paymentMethod === "card") {
+    const payment = await startCardPayment(orderId);
+    if ("paymentUrl" in payment) return { paymentUrl: payment.paymentUrl };
+    // الطلب اتعمل بس الدفع ما بدأش: نوديه لصفحة الطلب يجرّب تاني من هناك
+    redirect(`/account/orders/${orderId}?payment=start_failed`);
+  }
+
   redirect(`/account/orders/${orderId}?placed=1`);
 }

@@ -4,6 +4,7 @@ import { getAddresses } from "@/features/addresses/queries";
 import { getCart } from "@/features/cart/queries";
 import { CheckoutForm } from "@/features/checkout/components/checkout-form";
 import { requireUser } from "@/lib/auth";
+import { getPaymobConfig } from "@/features/payments/config";
 
 export const metadata = { title: "Checkout | Atelier Cairo" };
 
@@ -29,7 +30,11 @@ export default async function CheckoutPage() {
       <h1 className="mb-8 mt-3 font-[family-name:var(--font-display)] text-4xl uppercase tracking-tight">
         Checkout
       </h1>
-      <CheckoutForm addresses={addresses} lines={cart.lines} />
+      <CheckoutForm
+        addresses={addresses}
+        lines={cart.lines}
+        cardEnabled={getPaymobConfig() !== null}
+      />
     </div>
   );
 }

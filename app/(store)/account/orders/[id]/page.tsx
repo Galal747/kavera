@@ -1,26 +1,27 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { z } from "zod";
+import { addressSnapshotSchema } from "@/features/orders/address-snapshot";
 import {
   orderStatusLabel,
   orderStatusStyle,
   paymentMethodLabel,
   paymentStatusLabel,
 } from "@/features/orders/status";
+import { PayNowButton } from "@/features/payments/components/pay-now-button";
+import { PaymentStatusWatcher } from "@/features/payments/components/payment-status-watcher";
 import { requireUser } from "@/lib/auth";
 import { formatDateTime, formatPrice } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
 
-import { addressSnapshotSchema } from "@/features/orders/address-snapshot";
-
 type Props = {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ placed?: string }>;
+  searchParams: Promise<{ placed?: string; payment?: string }>;
 };
 
 export default async function OrderDetailsPage({ params, searchParams }: Props) {
   const { id } = await params;
-  const { placed } = await searchParams;
+  const { placed, payment } = await searchParams;
   if (!z.uuid().safeParse(id).success) notFound();
 
   const user = await requireUser(`/account/orders/${id}`);
@@ -44,6 +45,16 @@ export default async function OrderDetailsPage({ params, searchParams }: Props) 
   const discount = Number(order.discount);
   const shippingFee = Number(order.shipping_fee);
 
+  const isCard = order.payment_method === "card";
+  const awaitingPayment =
+    isCard &&
+    order.status === "pending" &&
+    (order.payment_status === "unpaid" || order.payment_status === "failed");
+  const returning = payment === "return";
+  const paidCardOrder = isCard && order.payment_status === "paid";
+  const cancelledUnpaid =
+    isCard && order.status === "cancelled" && order.payment_status !== "paid";
+
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 md:px-6">
       <Link
@@ -60,10 +71,53 @@ export default async function OrderDetailsPage({ params, searchParams }: Props) 
         >
           <p className="font-medium">Thank you! Your order has been placed.</p>
           <p className="mt-1">
-            {order.payment_method === "cod"
-              ? `Please have ${formatPrice(total)} ready in cash when it arrives.`
-              : "We'll let you know as soon as it ships."}
+            Please have {formatPrice(total)} ready in cash when it arrives.
           </p>
+        </div>
+      )}
+
+      {paidCardOrder && returning && (
+        <div
+          className="mt-4 border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900"
+          role="status"
+        >
+          <p className="font-medium">Payment received. Thank you!</p>
+          <p className="mt-1">We&apos;ll start preparing your order.</p>
+        </div>
+      )}
+
+      {awaitingPayment && returning && order.payment_status === "unpaid" && (
+        <div className="mt-4 border border-neutral-200 bg-white p-4">
+          <PaymentStatusWatcher />
+        </div>
+      )}
+
+      {awaitingPayment && !(returning && order.payment_status === "unpaid") && (
+        <div className="mt-4 space-y-3 border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+          <p className="font-medium">
+            {order.payment_status === "failed"
+              ? "Your last payment attempt didn't go through."
+              : payment === "start_failed"
+                ? "Your order is saved, but we couldn't open the payment page."
+                : "This order is waiting for payment."}
+          </p>
+          <p>
+            Your items are reserved for about an hour. Unpaid card orders are
+            cancelled automatically after that.
+          </p>
+          <PayNowButton
+            orderId={order.id}
+            label={
+              order.payment_status === "failed" ? "Try paying again" : "Pay now"
+            }
+          />
+        </div>
+      )}
+
+      {cancelledUnpaid && (
+        <div className="mt-4 border border-neutral-200 bg-neutral-50 p-4 text-sm text-neutral-700">
+          This order was cancelled and its items were released. You can place a
+          new order any time.
         </div>
       )}
 

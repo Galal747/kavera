@@ -71,7 +71,8 @@ export async function POST(request: NextRequest) {
   if (
     data === "amount_mismatch" ||
     data === "unknown_payment" ||
-    data === "needs_refund"
+    data === "needs_refund" ||
+    data === "duplicate_payment"
   ) {
     console.error(
       `[paymob] ATTENTION: ${data} (paymob order ${t.order.id}, transaction ${t.id})`,

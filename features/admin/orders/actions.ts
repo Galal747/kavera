@@ -21,6 +21,8 @@ const ERRORS: Record<string, string> = {
   invalid_transition:
     "This order's status has changed. Refresh the page and try again.",
   refund_required: "This order was already paid. Refunds aren't supported yet.",
+    payment_required:
+    "This card order hasn't been paid yet, so it can't move forward.",
 };
 
 export async function updateOrderStatusAction(

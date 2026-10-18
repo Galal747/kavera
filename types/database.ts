@@ -639,6 +639,15 @@ export type Database = {
         }
         Returns: string
       }
+      attach_paymob_intention: {
+        Args: { p_payment_id: string; p_paymob_order_id: number }
+        Returns: undefined
+      }
+      begin_card_payment: { Args: { p_order_id: string }; Returns: Json }
+      cancel_order_internal: {
+        Args: { p_order_id: string }
+        Returns: undefined
+      }
       create_order: {
         Args: {
           p_address_id: string
@@ -647,6 +656,10 @@ export type Database = {
           p_payment_method?: string
         }
         Returns: string
+      }
+      expire_unpaid_card_orders: {
+        Args: { p_minutes?: number }
+        Returns: number
       }
       is_admin: { Args: never; Returns: boolean }
       preview_order: {
