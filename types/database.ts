@@ -528,6 +528,24 @@ export type Database = {
         }
         Relationships: []
       }
+      rate_limits: {
+        Row: {
+          hits: number
+          key: string
+          window_start: string
+        }
+        Insert: {
+          hits?: number
+          key: string
+          window_start: string
+        }
+        Update: {
+          hits?: number
+          key?: string
+          window_start?: string
+        }
+        Relationships: []
+      }
       shipping_rates: {
         Row: {
           fee: number
@@ -647,6 +665,10 @@ export type Database = {
       cancel_order_internal: {
         Args: { p_order_id: string }
         Returns: undefined
+      }
+      consume_rate_limit: {
+        Args: { p_key: string; p_max: number; p_window_seconds: number }
+        Returns: boolean
       }
       create_order: {
         Args: {

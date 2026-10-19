@@ -2,10 +2,29 @@ import type { NextConfig } from "next";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
+const securityHeaders = [
+  // المتصفح ما يخمّنش نوع الملف
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  // ما نبعتش مسارات داخلية لمواقع تانية
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  // ما حدش يعرض موقعنا جوه iframe (clickjacking)
+  { key: "X-Frame-Options", value: "DENY" },
+  { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=()" },
+  // حماية خفيفة وآمنة: من غير script-src، عشان ما نكسرش Next.js
+  {
+    key: "Content-Security-Policy",
+    value: "frame-ancestors 'none'; base-uri 'self'; object-src 'none'; form-action 'self'",
+  },
+  // HTTPS بس (المتصفح بيتجاهله على localhost)
+  { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains" },
+];
+
 const nextConfig: NextConfig = {
-  /* config options here */
   experimental: {
     agentFeedback: true,
+  },
+  async headers() {
+    return [{ source: "/:path*", headers: securityHeaders }];
   },
   images: {
     remotePatterns: supabaseUrl
