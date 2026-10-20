@@ -37,6 +37,11 @@ export function ShopControls() {
     update({ q: q || null });
   }
 
+  // فلترة الأقسام عشان منظهرش الرجالي والحريمي كأقسام عادية
+  const filteredCategories = PRODUCT_CATEGORIES.filter(
+    (c) => c.toLowerCase() !== "men" && c.toLowerCase() !== "women"
+  );
+
   return (
     <div className="space-y-5">
       <div className="flex flex-col gap-3 md:flex-row">
@@ -79,7 +84,7 @@ export function ShopControls() {
         >
           All
         </button>
-        {PRODUCT_CATEGORIES.map((c) => (
+        {filteredCategories.map((c) => (
           <button
             key={c}
             type="button"

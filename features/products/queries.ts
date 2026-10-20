@@ -5,10 +5,9 @@ import type { Product, ProductCategory } from "@/types/product";
 import { getProductImageUrl } from "@/lib/storage";
 
 // ---------- شكل الـ query ----------
-// بنجيب المنتج + تصنيفه + الـ variants (بمقاساتها وألوانها) في طلب واحد.
-// categories!inner معناها: المنتج لازم يكون له تصنيف (وبتسمح لنا نفلتر بيه).
+// ضفنا هنا gender عشان الداتابيز ترجعهولنا
 const PRODUCT_SELECT = `
-  id, slug, name, description, base_price, is_new, created_at,
+  id, slug, name, description, base_price, is_new, created_at, gender,
   categories!inner ( slug ),
   product_variants (
     id, stock_quantity, price_override,
@@ -46,6 +45,7 @@ function toProduct(row: ProductRow): Product {
     name: row.name,
     description: row.description,
     category: row.categories.slug as ProductCategory,
+    gender: row.gender, // <-- السطر الجديد
     price: Number(row.base_price),
     isNew: row.is_new,
     inStock: variants.some((v) => v.stock_quantity > 0),
@@ -119,6 +119,7 @@ export type SortOption = "newest" | "price-asc" | "price-desc" | "name";
 
 export type GetProductsParams = {
   category?: ProductCategory;
+  gender?: string; // <-- ضفنا هنا الفلتر الجديد
   q?: string;
   sort?: SortOption;
   page?: number;
@@ -134,6 +135,7 @@ export type PaginatedProducts = {
 
 export async function getProducts({
   category,
+  gender, // <-- استقبلنا الفلتر هنا
   q,
   sort = "newest",
   page = 1,
@@ -144,6 +146,11 @@ export async function getProducts({
 
   if (category) {
     query = query.eq("categories.slug", category);
+  }
+
+  // <-- ضفنا الشرط بتاع فلتر النوع
+  if (gender) {
+    query = query.eq("gender", gender);
   }
 
   if (q) {
@@ -176,7 +183,7 @@ export async function getProducts({
   if (error) {
     // PGRST103 = طلبنا صفحة أكبر من آخر صفحة. نرجّع الصفحة الأولى.
     if (error.code === "PGRST103" && page > 1) {
-      return getProducts({ category, q, sort, page: 1, pageSize });
+      return getProducts({ category, gender, q, sort, page: 1, pageSize }); // <-- ضفنا gender هنا كمان
     }
     throw new Error(error.message);
   }

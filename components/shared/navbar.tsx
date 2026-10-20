@@ -6,10 +6,13 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { Heart, LogOut, Menu, ShoppingBag, User, X } from "lucide-react";
 import { BRAND } from "@/lib/brand";
-
+import { logoutAction } from "@/features/auth/actions";
+import { logoutAction as serverLogoutAction } from "@/features/auth/actions";
 const links = [
     { href: "/", label: "Home" },
     { href: "/shop", label: "Shop" },
+    { href: "/shop?gender=men", label: "Men" },
+    { href: "/shop?gender=women", label: "Women" },
     { href: "/shop?category=oversized", label: "Oversized" },
     { href: "/shop?category=hoodies", label: "Hoodies" },
     { href: "/shop?category=accessories", label: "Accessories" },
@@ -58,16 +61,14 @@ export function Navbar({ isLoggedIn, cartCount, logoutAction }: NavbarProps) {
     };
 
     // التنفيذ الفعلي بعد ما العميل يأكد
-    const confirmLogout = () => {
+const confirmLogout = () => {
         startTransition(async () => {
             if (logoutAction) {
-                await logoutAction();
+                await logoutAction(); // لو الدالة مبعوتة من ملف الـ Layout
             } else {
-                // حط هنا كود تسجيل الخروج بتاعك (signOut من NextAuth / Supabase ...)
-                console.log("User logged out");
+                await serverLogoutAction(); // الدالة اللي استوردناها من ملف الـ actions
             }
             setConfirmOpen(false);
-            router.refresh();
         });
     };
 
@@ -153,31 +154,23 @@ export function Navbar({ isLoggedIn, cartCount, logoutAction }: NavbarProps) {
                 </nav>
             </header>
 
-            {/*
-              القائمة والنوافذ برّه الـ <header> عن قصد: الهيدر عليه backdrop-blur،
-              وده بيخلي أي عنصر fixed جواه يتحسب بالنسبة للهيدر (ارتفاعه 64px) مش للشاشة
-            */}
-
             {/* Backdrop */}
             <div
-                className={`fixed inset-0 z-50 bg-neutral-900/60 backdrop-blur-sm transition-opacity duration-300 md:hidden ${
-                    open ? "opacity-100" : "pointer-events-none opacity-0"
-                }`}
+                className={`fixed inset-0 z-50 bg-neutral-900/60 backdrop-blur-sm transition-opacity duration-300 md:hidden ${open ? "opacity-100" : "pointer-events-none opacity-0"
+                    }`}
                 onClick={() => setOpen(false)}
                 aria-hidden="true"
             />
 
             {/* Drawer */}
             <div
-                className={`fixed left-0 top-0 z-[60] flex h-[100dvh] w-[85%] max-w-sm flex-col bg-white shadow-2xl transition-transform duration-300 ease-in-out md:hidden ${
-                    open ? "translate-x-0" : "-translate-x-full"
-                }`}
+                className={`fixed left-0 top-0 z-[60] flex h-[100dvh] w-[85%] max-w-sm flex-col bg-white shadow-2xl transition-transform duration-300 ease-in-out md:hidden ${open ? "translate-x-0" : "-translate-x-full"
+                    }`}
                 role="dialog"
                 aria-modal="true"
                 aria-label="Menu"
                 aria-hidden={!open}
-                inert={!open}
-            >
+                inert={!open}            >
                 <div className="flex h-16 shrink-0 items-center justify-between border-b border-neutral-100 px-4">
                     <Link
                         href="/"

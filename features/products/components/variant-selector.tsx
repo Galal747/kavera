@@ -10,8 +10,18 @@ import type { Product } from "@/types/product";
 
 export function VariantSelector({ product }: { product: Product }) {
   const router = useRouter();
-  const [color, setColor] = useState<string | null>(null);
-  const [size, setSize] = useState<string | null>(null);
+  
+  // بندور على أول نسخة من المنتج (لون + مقاس) تكون متاحة في المخزن
+  const defaultVariant = product.variants.find((v) => v.stock > 0);
+
+  // بنحط القيم الافتراضية للون والمقاس بدل ما يبدأوا فاضيين (null)
+  const [color, setColor] = useState<string | null>(
+    defaultVariant?.colorHex ?? product.colors[0] ?? null
+  );
+  const [size, setSize] = useState<string | null>(
+    defaultVariant?.size ?? product.sizes[0] ?? null
+  );
+  
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -34,7 +44,7 @@ export function VariantSelector({ product }: { product: Product }) {
     setColor(hex);
     setMessage(null);
     setError(null);
-    // لو المقاس المختار مش متاح بالون الجديد نشيله
+    // لو المقاس المختار مش متاح باللون الجديد نشيله
     if (size && (findVariant(hex, size)?.stock ?? 0) <= 0) setSize(null);
   }
 

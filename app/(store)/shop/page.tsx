@@ -8,9 +8,10 @@ import { PRODUCT_CATEGORIES } from "@/types/product";
 import { getWishlistProductIds } from "@/features/wishlist/queries";
 import { FadeIn } from "@/components/shared/fade-in";
 
-// الـ URL مدخل من المستخدم، فنتحقق منه دايمًا. أي قيمة غلط ترجع للافتراضي.
+// 1. ضفنا الـ gender هنا عشان الصفحة تفهم وتستقبل الفلتر من الرابط
 const searchSchema = z.object({
   category: z.enum(PRODUCT_CATEGORIES).optional().catch(undefined),
+  gender: z.enum(["men", "women", "unisex"]).optional().catch(undefined),
   q: z.string().trim().max(100).optional().catch(undefined),
   sort: z
     .enum(["newest", "price-asc", "price-desc", "name"])
@@ -30,6 +31,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   function buildHref(targetPage: number) {
     const params = new URLSearchParams();
     if (filters.category) params.set("category", filters.category);
+    if (filters.gender) params.set("gender", filters.gender); // 2. ضفنا السطر ده عشان نحافظ على الفلتر واحنا بنقلب في الصفحات
     if (filters.q) params.set("q", filters.q);
     if (filters.sort !== "newest") params.set("sort", filters.sort);
     if (targetPage > 1) params.set("page", String(targetPage));
@@ -37,11 +39,19 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
     return qs ? `/shop?${qs}` : "/shop";
   }
 
+  // 3. تحديد عنوان الصفحة بشكل شيك بناءً على الفلتر اللي اختاره المستخدم
+  let pageTitle = "All products";
+  if (filters.gender) {
+    pageTitle = filters.gender === "men" ? "Men's Collection" : filters.gender === "women" ? "Women's Collection" : "Unisex Collection";
+  } else if (filters.category) {
+    pageTitle = filters.category;
+  }
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 md:px-6">
       <FadeIn>
         <h1 className="font-[family-name:var(--font-display)] text-4xl uppercase tracking-tight">
-          {filters.category ?? "All products"}
+          {pageTitle}
         </h1>
         <p className="mb-6 mt-2 text-sm text-neutral-600">
           {total} {total === 1 ? "item" : "items"}

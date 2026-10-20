@@ -18,12 +18,14 @@ type ProductFormProps = {
   product?: { id: string; values: ProductFormValues };
 };
 
+// ضفنا الـ gender كقيمة افتراضية فاضية
 const emptyValues: ProductFormValues = {
   name: "",
   slug: "",
   description: "",
   price: "",
   categoryId: "",
+  gender: "unisex", // القيمة الافتراضية للجندر
   isActive: true,
   isFeatured: false,
   isNew: false,
@@ -122,7 +124,8 @@ export function ProductForm({ categories, product }: ProductFormProps) {
         )}
       </div>
 
-      <div className="grid gap-5 sm:grid-cols-2">
+      {/* خلينا الجريد 3 أعمدة بدل 2 عشان نحط الـ Gender جنبهم */}
+      <div className="grid gap-5 sm:grid-cols-3">
         <div className="space-y-1.5">
           <Label htmlFor="price">Price (EGP)</Label>
           <Input
@@ -157,6 +160,26 @@ export function ProductForm({ categories, product }: ProductFormProps) {
           {errors.categoryId && (
             <p className="text-sm text-red-600" role="alert">
               {errors.categoryId.message}
+            </p>
+          )}
+        </div>
+
+        {/* ضفنا حقل الـ Gender هنا */}
+        <div className="space-y-1.5">
+          <Label htmlFor="gender">Gender</Label>
+          <select
+            id="gender"
+            className="h-9 w-full border border-neutral-300 bg-white px-3 text-sm"
+            aria-invalid={errors.gender ? "true" : "false"}
+            {...register("gender")}
+          >
+            <option value="unisex">Unisex</option>
+            <option value="men">Men</option>
+            <option value="women">Women</option>
+          </select>
+          {errors.gender && (
+            <p className="text-sm text-red-600" role="alert">
+              {errors.gender.message}
             </p>
           )}
         </div>

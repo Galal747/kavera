@@ -27,7 +27,7 @@ export default async function EditProductPage({ params }: Props) {
     supabase
       .from("products")
       .select(
-        `id, slug, name, description, base_price, category_id,
+        `id, slug, name, description, base_price, category_id, gender,
          is_active, is_featured, is_new,
          product_variants (
            id, sku, stock_quantity, price_override,
@@ -92,7 +92,7 @@ export default async function EditProductPage({ params }: Props) {
               description: product.description ?? "",
               price: String(Number(product.base_price)),
               categoryId: product.category_id,
-              isActive: product.is_active,
+              gender: (product.gender as "unisex" | "men" | "women") || "unisex", isActive: product.is_active,
               isFeatured: product.is_featured,
               isNew: product.is_new,
             },

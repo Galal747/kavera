@@ -1,9 +1,11 @@
 export const PRODUCT_CATEGORIES = [
   "men",
   "women",
-  "oversized",
+  "t-shirts",
   "hoodies",
   "accessories",
+  "Tops",
+  "Jacket",
 ] as const;
 
 export type ProductCategory = (typeof PRODUCT_CATEGORIES)[number];
@@ -13,7 +15,7 @@ export type ProductVariant = {
   size: string;
   colorHex: string;
   stock: number;
-  price: number; // السعر الفعلي (price_override لو موجود، وإلا السعر الأساسي)
+  price: number; 
 };
 
 export type Product = {
@@ -22,11 +24,12 @@ export type Product = {
   name: string;
   description: string | null;
   category: ProductCategory;
-  price: number; // بالجنيه المصري
+  gender: string; 
+  price: number; 
   isNew: boolean;
   inStock: boolean;
-  colors: string[]; // hex
+  colors: string[]; 
   sizes: string[];
-  images: string[]; // روابط كاملة، الأولى هي الرئيسية
+  images: string[]; 
   variants: ProductVariant[];
 };

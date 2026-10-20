@@ -21,6 +21,9 @@ export const productSchema = z.object({
     .regex(/^\d{1,7}(\.\d{1,2})?$/, "Enter a valid price, e.g. 650 or 650.50")
     .refine((v) => Number(v) > 0, "Price must be greater than zero"),
   categoryId: z.uuid("Choose a category"),
+  gender: z.enum(["unisex", "men", "women"], {
+    errorMap: () => ({ message: "Choose a valid gender" }),
+  }), // <-- السطر الجديد الخاص بالنوع
   isActive: z.boolean(),
   isFeatured: z.boolean(),
   isNew: z.boolean(),

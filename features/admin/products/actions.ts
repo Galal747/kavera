@@ -25,6 +25,7 @@ function toRow(v: z.infer<typeof productSchema>) {
     description: v.description || null,
     base_price: Number(v.price),
     category_id: v.categoryId,
+    gender: v.gender, // <-- السطر الجديد لإرسال الجندر للداتابيز
     is_active: v.isActive,
     is_featured: v.isFeatured,
     is_new: v.isNew,

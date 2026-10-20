@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image"; // ضفنا ده عشان الكروت الجديدة
 import { NewsletterForm } from "@/features/home/components/newsletter-form";
 import { ProductCard } from "@/features/products/components/product-card";
 import {
@@ -34,6 +35,63 @@ export default async function HomePage() {
       </h1>
       <HeroSlider slides={HERO_SLIDES} autoPlayMs={HERO_AUTOPLAY_MS} />
       <AnnouncementBar messages={ANNOUNCEMENTS} />
+
+{/* Gender Collections (سكشن الرجالي والحريمي الجديد) */}
+      <section className="mx-auto max-w-7xl px-4 pt-12 pb-6 md:px-6">
+        <FadeIn>
+          {/* الهيدر الجديد */}
+          <div className="mb-6 flex items-end justify-between">
+            <h2 className="font-[family-name:var(--font-display)] text-3xl uppercase tracking-tight">
+              Shop by Gender
+            </h2>
+          </div>
+
+          {/* خليناهم grid-cols-2 دايماً عشان يبقوا جنب بعض، وقللنا المسافة في الموبايل لـ gap-2 */}
+          <div className="grid grid-cols-2 gap-2 md:gap-6">
+            
+            {/* كارت الرجالي */}
+            <Link 
+              href="/shop?gender=men" 
+              // زودنا الارتفاع هنا: h-[400px] للموبايل و h-[60vh] للشاشات الكبيرة
+              className="group relative block h-[400px] w-full overflow-hidden bg-neutral-100 sm:h-[500px] md:h-[60vh] md:min-h-[500px]"
+            >
+              <Image 
+                src="/collections/men.jpg" 
+                alt="Shop Men's Collection" 
+                fill 
+                className="object-cover transition-transform duration-700 ease-in-out group-hover:scale-105" 
+              />
+              <div className="absolute inset-0 bg-black/20 transition-colors duration-500 group-hover:bg-black/40" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <h2 className="font-[family-name:var(--font-display)] text-2xl uppercase tracking-widest text-white sm:text-3xl md:text-5xl">
+                  Men
+                </h2>
+              </div>
+            </Link>
+
+            {/* كارت الحريمي */}
+            <Link 
+              href="/shop?gender=women" 
+              // نفس زيادة الارتفاع هنا
+              className="group relative block h-[400px] w-full overflow-hidden bg-neutral-100 sm:h-[500px] md:h-[60vh] md:min-h-[500px]"
+            >
+              <Image 
+                src="/collections/woman.jpg" 
+                alt="Shop Women's Collection" 
+                fill 
+                className="object-cover transition-transform duration-700 ease-in-out group-hover:scale-105" 
+              />
+              <div className="absolute inset-0 bg-black/20 transition-colors duration-500 group-hover:bg-black/40" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <h2 className="font-[family-name:var(--font-display)] text-2xl uppercase tracking-widest text-white sm:text-3xl md:text-5xl">
+                  Women
+                </h2>
+              </div>
+            </Link>
+
+          </div>
+        </FadeIn>
+      </section>
 
       {/* Featured collections */}
       <CollectionsCarousel items={collections} />
