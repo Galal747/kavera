@@ -128,3 +128,39 @@
     @apply font-sans;
   }
 }
+
+/* شريط الإعلانات المتحرك (من اليمين لليسار) */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee-track {
+  animation: marquee var(--marquee-duration, 30s) linear infinite;
+  will-change: transform;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+/* اللي مفعّل "تقليل الحركة": نص ثابت في النص بدل الحركة */
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+    width: 100%;
+  }
+  .marquee-group {
+    min-width: 0;
+    flex-wrap: wrap;
+    justify-content: center;
+    row-gap: 0.25rem;
+  }
+  .marquee-group[aria-hidden="true"] {
+    display: none;
+  }
+}

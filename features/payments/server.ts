@@ -5,6 +5,7 @@ import { addressSnapshotSchema } from "@/features/orders/address-snapshot";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { PAYMOB_BASE_URL, getPaymobConfig } from "./config";
+import { BRAND } from "@/lib/brand";
 
 export type StartPaymentResult = { paymentUrl: string } | { error: string };
 
@@ -98,7 +99,7 @@ export async function startCardPayment(
           {
             name: `Order #${order_number}`,
             amount: amount_cents,
-            description: "Atelier Cairo order",
+            description: `${BRAND.name} order`,
             quantity: 1,
           },
         ],

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/auth";
+import { BRAND } from "@/lib/brand";
 
 export default async function AdminLayout({
     children,
@@ -12,7 +13,7 @@ export default async function AdminLayout({
                 <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 md:px-6">
                     <div className="flex items-center gap-6">
                         <span className="font-(family-name:--font-display) text-lg uppercase">
-                            Atelier Cairo · Admin
+                            {BRAND.name} · Admin
                         </span>
                         <nav className="flex gap-4 text-sm">
                             <Link href="/admin" className="hover:underline">

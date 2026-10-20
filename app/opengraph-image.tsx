@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
+import { BRAND } from "@/lib/brand";
 
-export const alt = "Atelier Cairo: Egyptian streetwear";
+export const alt = `${BRAND.name}: Egyptian streetwear`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -27,7 +28,7 @@ export default function OpengraphImage() {
             textTransform: "uppercase",
           }}
         >
-          Atelier Cairo
+          {BRAND.name}
         </div>
         <div style={{ marginTop: 24, fontSize: 32, color: "#a3a3a3" }}>
           Egyptian streetwear, made with intention.

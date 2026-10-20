@@ -15,12 +15,12 @@ export function ProductCard({ product, wished = false }: ProductCardProps) {
   const [mainImage, hoverImage] = product.images;
 
   return (
-    <div className="group relative">
+    <div className="group relative flex h-full flex-col rounded-xl bg-white p-2 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_10px_40px_-10px_rgba(0,0,0,0.12)] sm:p-3">
       <Link
         href={`/product/${product.slug}`}
         className="block focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-neutral-950"
       >
-        <div className="relative aspect-[3/4] overflow-hidden bg-neutral-200">
+        <div className="relative aspect-[3/4] overflow-hidden rounded-lg bg-neutral-200">
           {mainImage ? (
             <>
               <Image
@@ -48,18 +48,18 @@ export function ProductCard({ product, wished = false }: ProductCardProps) {
           )}
 
           {product.isNew && (
-            <span className="absolute left-3 top-3 bg-neutral-950 px-2 py-1 text-xs uppercase tracking-wider text-white">
+            <span className="absolute left-3 top-3 z-10 rounded bg-neutral-950 px-2 py-1 text-xs uppercase tracking-wider text-white">
               New
             </span>
           )}
           {!product.inStock && (
-            <span className="absolute bottom-3 left-3 bg-white px-2 py-1 text-xs uppercase tracking-wider text-neutral-950">
+            <span className="absolute bottom-3 left-3 z-10 rounded bg-white px-2 py-1 text-xs uppercase tracking-wider text-neutral-950">
               Sold out
             </span>
           )}
         </div>
 
-        <div className="mt-3 space-y-1">
+        <div className="mt-4 space-y-1 px-1">
           <h3 className="text-sm font-medium text-neutral-950">
             {product.name}
           </h3>
@@ -79,11 +79,14 @@ export function ProductCard({ product, wished = false }: ProductCardProps) {
         </div>
       </Link>
 
-      <WishlistButton
-        productId={product.id}
-        productName={product.name}
-        initialWished={wished}
-      />
+      {/* زرار المفضلة: مخفي في الديسكتوب وبيظهر مع الهوفر، وظاهر دايماً في الموبايل */}
+      <div className="absolute right-4 top-4 z-20 transition-opacity duration-300 md:opacity-0 md:group-hover:opacity-100">
+        <WishlistButton
+          productId={product.id}
+          productName={product.name}
+          initialWished={wished}
+        />
+      </div>
     </div>
   );
 }

@@ -6,6 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { BRAND } from "@/lib/brand";
+
 
 const newsletterSchema = z.object({
   email: z.email("Please enter a valid email address"),
@@ -36,7 +38,7 @@ export function NewsletterForm() {
   if (done) {
     return (
       <p className="text-sm text-emerald-400" role="status">
-        You&apos;re in. Welcome to Atelier Cairo.
+        You&apos;re in. Welcome to {BRAND.name}
       </p>
     );
   }

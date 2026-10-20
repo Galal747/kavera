@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Oswald } from "next/font/google";
 import "./globals.css";
+import { BRAND } from "@/lib/brand";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 const oswald = Oswald({ subsets: ["latin"], variable: "--font-display" });
@@ -10,10 +11,10 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 export const metadata: Metadata = {
   // أساس روابط صور المشاركة (Open Graph) النسبية
   metadataBase: new URL(siteUrl),
-  title: "Atelier Cairo",
+  title: BRAND.name,
   description: "Egyptian streetwear, made with intention.",
   openGraph: {
-    siteName: "Atelier Cairo",
+    siteName: BRAND.name,
     type: "website",
   },
   twitter: { card: "summary_large_image" },
